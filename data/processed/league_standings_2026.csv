@@ -1,0 +1,31 @@
+Season,League,Division,Division_Rank,Team_ID,Team_Abbr,Team,Team_Full_Name,Games_Back
+2026,AL,AL East,1,139,TB,Rays,Tampa Bay Rays,0.0
+2026,AL,AL East,2,147,NYY,Yankees,New York Yankees,-4.5
+2026,AL,AL East,3,111,BOS,Red Sox,Boston Red Sox,-11.0
+2026,AL,AL East,4,110,BAL,Orioles,Baltimore Orioles,-18.5
+2026,AL,AL East,5,141,TOR,Blue Jays,Toronto Blue Jays,-19.0
+2026,AL,AL Central,1,114,CLE,Guardians,Cleveland Guardians,0.0
+2026,AL,AL Central,2,145,CWS,White Sox,Chicago White Sox,-1.0
+2026,AL,AL Central,3,142,MIN,Twins,Minnesota Twins,-8.0
+2026,AL,AL Central,4,116,DET,Tigers,Detroit Tigers,-9.0
+2026,AL,AL Central,5,118,KC,Royals,Kansas City Royals,-16.0
+2026,AL,AL West,1,117,HOU,Astros,Houston Astros,0.0
+2026,AL,AL West,2,140,TEX,Rangers,Texas Rangers,-1.0
+2026,AL,AL West,3,136,SEA,Mariners,Seattle Mariners,-5.0
+2026,AL,AL West,4,133,ATH,Athletics,Athletics,-17.0
+2026,AL,AL West,5,108,LAA,Angels,Los Angeles Angels,-19.0
+2026,NL,NL East,1,144,ATL,Braves,Atlanta Braves,0.0
+2026,NL,NL East,2,143,PHI,Phillies,Philadelphia Phillies,-6.0
+2026,NL,NL East,3,146,MIA,Marlins,Miami Marlins,-14.0
+2026,NL,NL East,4,120,WSH,Nationals,Washington Nationals,-17.0
+2026,NL,NL East,5,121,NYM,Mets,New York Mets,-20.0
+2026,NL,NL Central,1,158,MIL,Brewers,Milwaukee Brewers,0.0
+2026,NL,NL Central,2,112,CHC,Cubs,Chicago Cubs,-14.0
+2026,NL,NL Central,3,134,PIT,Pirates,Pittsburgh Pirates,-21.0
+2026,NL,NL Central,4,138,STL,Cardinals,St. Louis Cardinals,-26.0
+2026,NL,NL Central,5,113,CIN,Reds,Cincinnati Reds,-28.0
+2026,NL,NL West,1,119,LAD,Dodgers,Los Angeles Dodgers,0.0
+2026,NL,NL West,2,135,SD,Padres,San Diego Padres,-9.0
+2026,NL,NL West,3,109,AZ,D-backs,Arizona Diamondbacks,-14.0
+2026,NL,NL West,4,137,SF,Giants,San Francisco Giants,-35.0
+2026,NL,NL West,5,115,COL,Rockies,Colorado Rockies,-42.0

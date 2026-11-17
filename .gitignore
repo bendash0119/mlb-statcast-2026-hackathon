@@ -1,0 +1,18 @@
+# macOS / OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+
+# Hackathon Large Data (Pitch-by-pitch raw CSV / Parquet > 50MB)
+# 請將超過 50MB 的巨量逐球數據放在 data/large/，不進 Git 版本控制
+data/large/
+*.parquet
+*.feather
+*.duckdb
+*.sqlite
