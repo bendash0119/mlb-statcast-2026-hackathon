@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>一二壘有人：封殺三壘決策模擬器 | 2026 棒球數據黑客松</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <div class="badge-row">
+          <span class="badge accent">2026 野革盃黑客松 MVP 雛形</span>
+          <span class="badge">RE24 × WPA × 時間差邏輯斯模型</span>
+          <span class="badge" id="meta-play-count">載入 2026 Statcast 資料中...</span>
+        </div>
+        <h1>一二壘有人：封殺三壘決策模擬器</h1>
+        <p class="subtitle">
+          量化「拚封殺三壘」與「穩抓一／二壘」的損益兩平點（BEP），結合 2026 MLB Statcast 滾地球與短打實戰數據，為內野守備教練產出賽前紅綠燈戰術圖。
+        </p>
+      </div>
+      <div class="header-actions no-print">
+        <button id="btn-reset" class="btn secondary">恢復預設參數</button>
+        <button id="btn-print" class="btn primary">列印賽前戰術表</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel controls-strip no-print">
+      <div class="control-group">
+        <label for="sel-league">期望值基準聯盟</label>
+        <select id="sel-league">
+          <option value="CPBL_Rebas_Ref">CPBL（野革參考基準）</option>
+          <option value="MLB_Modern">MLB（2024–2026 現代基準）</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="sel-playtype">進攻球路類型</label>
+        <select id="sel-playtype">
+          <option value="bunt">觸擊短打 (Bunt)</option>
+          <option value="gb">一般內野滾地球 (Ground Ball)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="sel-comparison">對照安全守備選項</label>
+        <select id="sel-comparison">
+          <option value="vs_1b">傳三壘 vs 穩傳一壘（跑者進二三壘）</option>
+          <option value="vs_2b">傳三壘 vs 抓二壘單殺（跑者進一三壘）</option>
+        </select>
+      </div>
+      <div class="control-group slider-group">
+        <label for="rng-ev">擊球初速 (EV): <strong id="val-ev">52 mph</strong></label>
+        <input id="rng-ev" type="range" min="35" max="105" step="1" value="52" />
+      </div>
+      <div class="control-group toggle-group">
+        <label class="checkbox-label">
+          <input id="chk-overlay" type="checkbox" checked />
+          <span>疊加 2026 MLB 實戰落點</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="scenario-grid">
+      <div class="panel scenario-card conservative">
+        <div class="scenario-header">
+          <div>
+            <span class="tag blue">情境 A｜一般局數（RE24 失分最小化）</span>
+            <h2>保守守備門檻</h2>
+          </div>
+          <div class="bep-pill blue">
+            <span>最低成功率 BEP</span>
+            <strong id="bep-left">--%</strong>
+          </div>
+        </div>
+        <div class="scenario-inputs no-print">
+          <div>
+            <label for="left-outs">出局數</label>
+            <select id="left-outs">
+              <option value="0" selected>無人出局 (0 Out)</option>
+              <option value="1">一出局 (1 Out)</option>
+            </select>
+          </div>
+          <div>
+            <label>局數範圍</label>
+            <input type="text" value="1～6 局（自動採用 RE24）" disabled />
+          </div>
+        </div>
+        <div class="tree-summary" id="tree-left"></div>
+      </div>
+
+      <div class="panel scenario-card aggressive">
+        <div class="scenario-header">
+          <div>
+            <span class="tag orange">情境 B｜關鍵後段（WPA 勝率最大化）</span>
+            <h2>搶勝守備門檻</h2>
+          </div>
+          <div class="bep-pill orange">
+            <span>最低成功率 BEP</span>
+            <strong id="bep-right">--%</strong>
+          </div>
+        </div>
+        <div class="scenario-inputs no-print">
+          <div>
+            <label for="right-inning">局數</label>
+            <select id="right-inning">
+              <option value="7">7 局</option>
+              <option value="8">8 局</option>
+              <option value="9" selected>9 局</option>
+              <option value="10">延長賽</option>
+            </select>
+          </div>
+          <div>
+            <label for="right-half">上下半局</label>
+            <select id="right-half">
+              <option value="top">上半（主隊守備）</option>
+              <option value="bot" selected>下半（客隊守備）</option>
+            </select>
+          </div>
+          <div>
+            <label for="right-diff">守備方比分差</label>
+            <select id="right-diff">
+              <option value="-3">落後 3 分</option>
+              <option value="-2">落後 2 分</option>
+              <option value="-1">落後 1 分</option>
+              <option value="0" selected>平手 (0)</option>
+              <option value="1">領先 1 分</option>
+              <option value="2">領先 2 分</option>
+              <option value="3">領先 3 分</option>
+            </select>
+          </div>
+          <div>
+            <label for="right-outs">出局數</label>
+            <select id="right-outs">
+              <option value="0" selected>無人出局 (0 Out)</option>
+              <option value="1">一出局 (1 Out)</option>
+            </select>
+          </div>
+        </div>
+        <div class="tree-summary" id="tree-right"></div>
+      </div>
+    </section>
+
+    <section class="panel player-params no-print">
+      <div class="param-block">
+        <h3>二壘跑者速度參數（對方領先跑者）</h3>
+        <div class="param-row">
+          <div>
+            <label for="sel-runner-preset">2026 MLB 實測範本</label>
+            <select id="sel-runner-preset"></select>
+          </div>
+          <div>
+            <label for="rng-runner-90">90 ft 衝刺秒數: <strong id="val-runner-90">4.02 s</strong></label>
+            <input id="rng-runner-90" type="range" min="3.55" max="4.85" step="0.02" value="4.02" />
+          </div>
+          <div>
+            <label for="rng-lead">二壘離壘距離: <strong id="val-lead">12 ft</strong></label>
+            <input id="rng-lead" type="range" min="8" max="16" step="1" value="12" />
+          </div>
+        </div>
+      </div>
+      <div class="param-block">
+        <h3>我方內野守備臂力與轉傳修正</h3>
+        <div class="param-row">
+          <div>
+            <label for="rng-arm-offset">全隊傳球臂力調整: <strong id="val-arm-offset">0 mph</strong></label>
+            <input id="rng-arm-offset" type="range" min="-10" max="10" step="1" value="0" />
+          </div>
+          <div>
+            <label for="rng-ex-offset">接球轉傳速度調整: <strong id="val-ex-offset">0.00 s</strong></label>
+            <input id="rng-ex-offset" type="range" min="-0.20" max="0.25" step="0.02" value="0" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel chart-stage">
+      <div class="stage-header">
+        <div>
+          <h2>內野滾地球／短打「封殺三壘紅綠燈熱區圖」</h2>
+          <p class="hint">移動滑鼠在內野草皮上任意位置，即時查看該落點的球速抵達時間、跑者時間差與封殺成功率！</p>
+        </div>
+        <div class="legend">
+          <span class="leg-item"><i class="dot green"></i>保守情境即可傳三壘</span>
+          <span class="leg-item"><i class="dot orange"></i>僅關鍵搶勝局數拚三壘</span>
+          <span class="leg-item"><i class="dot navy"></i>穩傳一／二壘（勿硬傳三壘）</span>
+          <span class="leg-item"><i class="ring r-succ"></i>2026 封殺三壘成功</span>
+          <span class="leg-item"><i class="ring r-safe"></i>2026 穩傳一壘</span>
+          <span class="leg-item"><i class="ring r-fail"></i>2026 野手選擇/失誤</span>
+        </div>
+      </div>
+
+      <div class="probe-bar" id="probe-bar">
+        將游標移入下方內野球場圖，即時模擬該落點的「傳三壘決策」與時間差（Time Margin）。
+      </div>
+
+      <div class="diamonds-grid">
+        <div class="diamond-card">
+          <div class="diamond-title">
+            <span class="tag blue">情境 A｜保守（RE24）</span>
+            <span id="title-bep-left">門檻 --%</span>
+          </div>
+          <svg id="svg-left" viewBox="-125 -15 250 185" class="field-svg"></svg>
+          <div class="cutoff-readout" id="cutoff-left"></div>
+        </div>
+
+        <div class="diamond-card">
+          <div class="diamond-title">
+            <span class="tag orange">情境 B｜搶勝（WPA）</span>
+            <span id="title-bep-right">門檻 --%</span>
+          </div>
+          <svg id="svg-right" viewBox="-125 -15 250 185" class="field-svg"></svg>
+          <div class="cutoff-readout" id="cutoff-right"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel lineup-panel">
+      <div class="stage-header">
+        <div>
+          <h2>賽前情蒐戰術卡：不同腳程二壘跑者「最大傳三壘半徑」速查表</h2>
+          <p class="hint">依據 2026 MLB 實測跑者分位數（可自由編輯秒數），以投手（P）／捕手（C）／一壘手（1B）接球傳三壘為例，列出臨界最大傳球距離（ft）。</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="tactical-table">
+          <thead>
+            <tr>
+              <th>跑者腳程分級</th>
+              <th>2026 MLB 代表球員</th>
+              <th>90 ft 秒數 (s)</th>
+              <th>預估二壘→三壘耗時</th>
+              <th>保守情境（RE24）最大傳球距離</th>
+              <th>關鍵搶勝（WPA）最大傳球距離</th>
+              <th>實戰守備建議</th>
+            </tr>
+          </thead>
+          <tbody id="lineup-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel method-panel">
+      <h2>方法論與黑客松評審對齊說明</h2>
+      <div class="method-grid">
+        <div class="method-box">
+          <h3>STEP 1｜損益兩平點（BEP）決策樹</h3>
+          <p>守備方目標是讓「傳三壘期望失分」低於「穩傳一／二壘期望失分」（後段局數則最大化守備方勝率 WE）：</p>
+          <code>BEP = (RE_滿壘失敗 − RE_穩傳) / (RE_滿壘失敗 − RE_封殺三壘成功)</code>
+          <p class="small">以 CPBL 0 出局一二壘為例：<code>(2.34 − 1.41) / (2.34 − 0.915) = 65.3%</code>；但到 9 局下平手時，穩傳讓跑者上三壘幾乎必敗，BEP 會驟降至 <code>~40%</code>，守備方應果斷拚三壘。</p>
+        </div>
+        <div class="method-box">
+          <h3>STEP 2｜時間差邏輯斯模型（Time-Margin）</h3>
+          <p>為了讓中職與業餘教練僅憑碼錶就能操作，模型將封殺機率拆解為球與跑者的賽跑：</p>
+          <code>Time Margin = T_跑者(二壘→三壘) − (T_滾動 + T_轉傳 + T_傳球飛行 + 0.08s)</code>
+          <p class="small">透過邏輯斯轉換 <code>P = 1 / (1 + exp(-Margin / 0.18))</code> 計算內野每一個 (x, y) 座標點的封殺成功率，並疊加 2026 MLB 實戰 2,375 筆事件進行對照驗證。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
