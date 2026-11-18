@@ -59,23 +59,24 @@ function predictForce3B(x, y, overrides = {}) {
   const dist3B = Math.hypot(x - THIRD_BASE_X, y - THIRD_BASE_Y);
 
   const evFts = Math.max(20, ev * 1.46667);
-  const vRoll = isBunt ? Math.max(18, evFts * 0.46) : Math.max(28, evFts * 0.58);
+  const vRoll = isBunt ? Math.max(16, evFts * 0.38) : Math.max(28, evFts * 0.56);
   const tRoll = distHP / vRoll;
 
   let tExchange, tThrow;
   if (dist3B <= 8.0) {
     tExchange = 0.28;
-    tThrow = dist3B / 24.0;
+    tThrow = dist3B / 22.0;
   } else {
     tExchange = exchangeBase;
-    const vThrowFts = Math.max(60, armMph * 1.46667 * 0.91);
+    const vThrowFts = Math.max(60, armMph * 1.46667 * 0.90);
     tThrow = dist3B / vThrowFts;
   }
 
   const tBall = tRoll + tExchange + tThrow + 0.08;
-  const reactionSec = isBunt ? 0.25 : 0.42;
-  const runDist = Math.max(65, 90 - leadFt);
-  const tRunner = runner90 * (runDist / 90) + reactionSec;
+  const effSpeedFts = 90 / Math.max(2.8, runner90 - 0.55);
+  const runDist = Math.max(62, 90 - leadFt);
+  const startOffset = isBunt ? -0.15 : 0.22;
+  const tRunner = runDist / effSpeedFts + startOffset;
 
   const margin = tRunner - tBall;
   const prob = 1 / (1 + Math.exp(-Math.max(-20, Math.min(20, margin / 0.18))));
@@ -188,9 +189,9 @@ function drawDiamond(svgId, mode, bepCons, bepAgg) {
     <rect x="${b2.sx - 3.5}" y="${b2.sy - 3.5}" width="7" height="7" transform="rotate(45 ${b2.sx} ${b2.sy})" fill="#f8fafc"/>
     <rect x="${b3.sx - 4}" y="${b3.sy - 4}" width="8" height="8" transform="rotate(45 ${b3.sx} ${b3.sy})" fill="#fde047" stroke="#111" stroke-width="0.8"/>
     <polygon points="${hp.sx},${hp.sy + 3} ${hp.sx - 3.5},${hp.sy - 1} ${hp.sx - 3.5},${hp.sy - 4} ${hp.sx + 3.5},${hp.sy - 4} ${hp.sx + 3.5},${hp.sy - 1}" fill="#f8fafc"/>
-    <text x="${b3.sx - 12}" y="${b3.sy + 2}" text-anchor="end" font-size="8" fill="#fde047" font-weight="800">3B 封殺目標</text>
-    <text x="${b1.sx + 9}" y="${b1.sy + 2}" text-anchor="start" font-size="7.5" fill="#cbd5e1">1B</text>
-    <text x="${b2.sx}" y="${b2.sy - 7}" text-anchor="middle" font-size="7.5" fill="#cbd5e1">2B (跑者起點)</text>
+    <text x="${b3.sx - 10}" y="${b3.sy + 14}" text-anchor="end" font-size="7.5" fill="#fde047" font-weight="800">3B 封殺目標</text>
+    <text x="${b1.sx + 9}" y="${b1.sy + 14}" text-anchor="start" font-size="7.5" fill="#cbd5e1">1B</text>
+    <text x="${b2.sx}" y="${b2.sy - 11}" text-anchor="middle" font-size="7.5" fill="#cbd5e1" font-weight="600">2B (跑者起點)</text>
   `;
 
   if (state.showOverlay) {
@@ -264,9 +265,10 @@ function renderLineupTable(bepCons, bepAgg) {
   tbody.innerHTML = "";
   MODEL_DATA.runner_presets.forEach((rp, idx) => {
     const tr = document.createElement("tr");
-    const runDist = Math.max(65, 90 - state.leadFt);
-    const reaction = state.playType === "bunt" ? 0.25 : 0.42;
-    const tRunner = rp.sec_90ft * (runDist / 90) + reaction;
+    const effSpeedFts = 90 / Math.max(2.8, rp.sec_90ft - 0.55);
+    const runDist = Math.max(62, 90 - state.leadFt);
+    const startOffset = state.playType === "bunt" ? -0.15 : 0.22;
+    const tRunner = runDist / effSpeedFts + startOffset;
     const rCons = calcMaxThrowRadiusFt(rp.sec_90ft, bepCons);
     const rAgg = calcMaxThrowRadiusFt(rp.sec_90ft, bepAgg);
 

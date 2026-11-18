@@ -19,13 +19,13 @@ WEB_DATA_DIR = BASE_DIR / "web" / "data"
 THIRD_BASE_X = -63.6396
 THIRD_BASE_Y = 63.6396
 
-# 各守位預設接球轉傳時間 (秒) 與預設傳球球速 (mph)
+# 各守位預設接球轉傳時間 (秒，含轉身調整步伐) 與預設傳球球速 (mph)
 DEFAULT_POS_PARAMS = {
-    "P": {"label": "投手 (P)", "exchange_sec": 0.80, "arm_mph": 78.0, "x": 0.0, "y": 60.5},
-    "C": {"label": "捕手 (C)", "exchange_sec": 0.68, "arm_mph": 82.0, "x": 0.0, "y": 4.0},
-    "1B": {"label": "一壘手 (1B)", "exchange_sec": 0.78, "arm_mph": 79.0, "x": 58.0, "y": 78.0},
-    "3B": {"label": "三壘手 (3B)", "exchange_sec": 0.65, "arm_mph": 86.0, "x": -56.0, "y": 82.0},
-    "SS": {"label": "游擊手 (SS)", "exchange_sec": 0.70, "arm_mph": 87.5, "x": -34.0, "y": 122.0},
+    "P": {"label": "投手 (P)", "exchange_sec": 0.96, "arm_mph": 78.0, "x": 0.0, "y": 60.5},
+    "C": {"label": "捕手 (C)", "exchange_sec": 0.84, "arm_mph": 82.0, "x": 0.0, "y": 4.0},
+    "1B": {"label": "一壘手 (1B)", "exchange_sec": 1.04, "arm_mph": 76.0, "x": 58.0, "y": 78.0},
+    "3B": {"label": "三壘手 (3B)", "exchange_sec": 0.78, "arm_mph": 83.5, "x": -56.0, "y": 82.0},
+    "SS": {"label": "游擊手 (SS)", "exchange_sec": 0.85, "arm_mph": 84.5, "x": -34.0, "y": 122.0},
 }
 
 
@@ -194,30 +194,31 @@ def predict_force_3b_prob(
     # 1. 球滾動至野手時間 (秒)
     ev_fts = max(20.0, exit_vel_mph * 1.46667)
     if is_bunt:
-        # 觸擊短打地面摩擦減速顯著，有效均速約為初速的 46%
-        v_roll = max(18.0, ev_fts * 0.46)
+        # 觸擊短打草皮減速明顯，有效均速約為初速的 38%
+        v_roll = max(16.0, ev_fts * 0.38)
     else:
-        # 一般內野滾地球有效均速約為初速的 58%
-        v_roll = max(28.0, ev_fts * 0.58)
+        # 一般內野滾地球有效均速約為初速的 56%
+        v_roll = max(28.0, ev_fts * 0.56)
     t_roll = dist_hp / v_roll
 
     # 2. 傳球飛行時間 (秒) - 若落點在三壘壘包 8 ft 內視為三壘手自踩壘包
     if dist_3b <= 8.0:
         t_exchange = 0.28
-        t_throw = dist_3b / 24.0
+        t_throw = dist_3b / 22.0
     else:
         t_exchange = exchange_sec
-        v_throw_fts = max(60.0, arm_mph * 1.46667 * 0.91)  # 空氣阻力修正 0.91
+        v_throw_fts = max(60.0, arm_mph * 1.46667 * 0.90)  # 空氣阻力修正 0.90
         t_throw = dist_3b / v_throw_fts
 
     t_catch_3b = 0.08  # 封殺只需接球踩包，無需觸殺 (Tag)
     t_ball = t_roll + t_exchange + t_throw + t_catch_3b
 
-    # 3. 二壘跑者衝向三壘時間 (秒)
-    # 短打時二壘跑者較早啟動 (反應 0.25s)；一般滾地球需判斷球落地方向 (反應 0.42s)
-    reaction_sec = 0.25 if is_bunt else 0.42
-    run_dist_ft = max(65.0, 90.0 - secondary_lead_ft)
-    t_runner = runner_90ft_sec * (run_dist_ft / 90.0) + reaction_sec
+    # 3. 二壘跑者衝向三壘時間 (秒，扣除打擊區揮棒啟動時間 0.55s，反映二壘動態離壘加速)
+    eff_speed_fts = 90.0 / max(2.8, runner_90ft_sec - 0.55)
+    run_dist_ft = max(62.0, 90.0 - secondary_lead_ft)
+    # 短打時跑者隨投球提前起跑（動態優勢 -0.15s）；滾地球需短暫判斷平飛球風險（+0.22s）
+    start_offset = -0.15 if is_bunt else 0.22
+    t_runner = (run_dist_ft / eff_speed_fts) + start_offset
 
     time_margin = t_runner - t_ball  # > 0 代表球比跑者早到三壘
     z = max(-20.0, min(20.0, time_margin / sigma_sec))
