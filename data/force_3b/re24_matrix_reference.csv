@@ -1,0 +1,17 @@
+league,base_state,re_0_out,re_1_out,re_2_out
+MLB_Modern,Empty,0.481,0.254,0.098
+MLB_Modern,1B,0.859,0.509,0.224
+MLB_Modern,2B,1.1,0.664,0.319
+MLB_Modern,3B,1.35,0.95,0.353
+MLB_Modern,1B_2B,1.437,0.884,0.429
+MLB_Modern,1B_3B,1.784,1.13,0.478
+MLB_Modern,2B_3B,1.964,1.376,0.58
+MLB_Modern,1B_2B_3B,2.292,1.541,0.752
+CPBL_Rebas_Ref,Empty,0.5,0.265,0.099
+CPBL_Rebas_Ref,1B,0.885,0.525,0.23
+CPBL_Rebas_Ref,2B,1.135,0.685,0.325
+CPBL_Rebas_Ref,3B,1.395,0.96,0.371
+CPBL_Rebas_Ref,1B_2B,1.48,0.915,0.44
+CPBL_Rebas_Ref,1B_3B,1.825,1.16,0.495
+CPBL_Rebas_Ref,2B_3B,2.01,1.41,0.6
+CPBL_Rebas_Ref,1B_2B_3B,2.34,1.585,0.775

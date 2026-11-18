@@ -7,17 +7,30 @@
 ```text
 mlb-statcast-2026-hackathon/
 ├── data/
-│   ├── processed/          # 已清理並加上 Team_ID / Team_Abbr 的 CSV 與 JSON（直接進入 Git 供團隊共用）
-│   ├── raw/                # 從 Baseball Savant 頁面擷取的原始 JSON 備份
-│   └── large/              # [Git 忽略] 存放巨量資料（如 71 萬筆逐球 Parquet/CSV），不推上 GitHub
+│   ├── processed/          # 2026 MLB 聯盟與球隊彙總 CSV / JSON（30 隊打擊、投球、逐日紀錄）
+│   ├── force_3b/           # 「一二壘有人：封殺三壘決策」專題整合資料集、RE24/BEP 表與 2026 跑速/臂力榜
+│   │   ├── leaderboards/   # 2026 Sprint Speed, 90ft Splits, Arm Strength, Catcher Pop Time
+│   │   └── DATA_DICTIONARY.md
+│   ├── raw/                # 從 Baseball Savant League 頁面擷取的原始 JSON 備份
+│   └── large/              # [Git 忽略] 存放巨量原始逐球檔（如 15MB RISP 原檔），不推上 GitHub
 ├── scripts/
-│   └── load_data.py        # 一鍵載入所有 2026 數據表為 Pandas DataFrame 的工具腳本
+│   ├── load_data.py              # 載入 2026 聯盟彙總表
+│   ├── load_force_3b_data.py     # 載入「一二壘有人封殺三壘」專題所有資料表
+│   └── build_force_3b_datasets.py# 從原始 Statcast 檔重建並串接封殺三壘特徵表
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
-## 2. 已收錄的 2026 數據集一覽 (`data/processed/`)
+## 2. 專題數據：「一二壘有人封殺三壘決策」(`data/force_3b/`)
+
+詳細欄位定義請參閱 [`data/force_3b/DATA_DICTIONARY.md`](data/force_3b/DATA_DICTIONARY.md)：
+- **`mlb_2026_1b2b_groundballs_bunts.csv`**（**2,375 筆**）：2026 MLB 整季所有精確「一二壘有人（無三壘跑者）、0 或 1 出局」的滾地球與短打，已轉換球場英尺座標 (`field_x_ft`, `field_y_ft`, `dist_to_3b_ft`) 並串接二壘跑者衝刺速度（配對率 99.3%）與野手傳球臂力（配對率 86.1%）。
+- **`mlb_2026_1b2b_bunts_only.csv`**（**325 筆**）：一二壘有人短打專題子表。
+- **`force_3b_bep_scenarios.csv` & `re24_matrix_reference.csv`**：MLB 與 CPBL (Rebas 基準) 的 RE24 矩陣與封殺三壘損益兩平點（BEP）門檻表（0 出局傳三壘 vs 傳一壘 BEP ≈ `65.1%`；1 出局高達 `86.4%`）。
+- **`leaderboards/`**：2026 全聯盟跑速 (`sprint_speed_2026.csv`)、每 5 英尺 90ft 分段秒數 (`running_splits_90ft_2026.csv`)、內野臂力 (`arm_strength_2026.csv`) 與捕手轉傳時間 (`catcher_poptime_2026.csv`)。
+
+## 3. 2026 MLB 聯盟彙總數據集 (`data/processed/`)
 
 所有球隊統計表均包含 **30 支 MLB 球隊 + 1 列 `MLB` 全聯盟總計（共 31 列）**，並已附上 `Team_ID`、`Team_Abbr`（如 `NYY`, `LAD`）與 `Team` 名稱：
 

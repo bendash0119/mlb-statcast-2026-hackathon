@@ -1,0 +1,9 @@
+league,outs_when_up,comparison,re_if_safe_option,re_if_3b_success,re_if_3b_fail_loaded,bep_min_success_prob,bep_pct,notes
+MLB_Modern,0,Force_3B_vs_Safe_1B,1.376,0.884,2.292,0.6506,65.1%,0出局一二壘有人(如短打/軟弱滾地球)：傳三壘 vs 穩抓一壘
+MLB_Modern,0,Force_3B_vs_Force_2B_SingleOut,1.13,0.884,2.292,0.8253,82.5%,0出局一二壘有人(無法雙殺時)：傳三壘 vs 穩抓二壘單殺
+MLB_Modern,1,Force_3B_vs_Safe_1B,0.58,0.429,1.541,0.8642,86.4%,1出局一二壘有人：傳三壘 vs 穩抓一壘(2出局二三壘)
+MLB_Modern,1,Force_3B_vs_Force_2B_SingleOut,0.478,0.429,1.541,0.9559,95.6%,1出局一二壘有人(無法雙殺時)：傳三壘 vs 穩抓二壘單殺(2出局一三壘)
+CPBL_Rebas_Ref,0,Force_3B_vs_Safe_1B,1.41,0.915,2.34,0.6526,65.3%,0出局一二壘有人(如短打/軟弱滾地球)：傳三壘 vs 穩抓一壘
+CPBL_Rebas_Ref,0,Force_3B_vs_Force_2B_SingleOut,1.16,0.915,2.34,0.8281,82.8%,0出局一二壘有人(無法雙殺時)：傳三壘 vs 穩抓二壘單殺
+CPBL_Rebas_Ref,1,Force_3B_vs_Safe_1B,0.6,0.44,1.585,0.8603,86.0%,1出局一二壘有人：傳三壘 vs 穩抓一壘(2出局二三壘)
+CPBL_Rebas_Ref,1,Force_3B_vs_Force_2B_SingleOut,0.495,0.44,1.585,0.952,95.2%,1出局一二壘有人(無法雙殺時)：傳三壘 vs 穩抓二壘單殺(2出局一三壘)
